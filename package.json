@@ -1,0 +1,28 @@
+{
+  "name": "Hackson5",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.32.1",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.2"
+  },
+  "lint-staged": {
+    "frontend/**/*.{ts,tsx,js,jsx}": [
+      "pnpm --dir frontend exec eslint --fix",
+      "pnpm --dir frontend exec prettier --write"
+    ],
+    "backend/**/*.py": [
+      "uv run --directory backend ruff check --fix",
+      "uv run --directory backend ruff format"
+    ]
+  }
+}
