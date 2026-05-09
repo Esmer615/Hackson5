@@ -11,7 +11,8 @@ COPY backend/ /app/backend/
 # Install dependencies
 WORKDIR /app/backend
 RUN uv sync --frozen --no-dev
+ENV PATH="/app/backend/.venv/bin:$PATH"
 
 # Run migrations and start server
 EXPOSE 8000
-CMD ["sh", "-c", "uv run python manage.py migrate && uv run gunicorn config.asgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2"]
