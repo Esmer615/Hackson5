@@ -85,6 +85,14 @@ Hackson5/
 - Return consistent response format: `{"data": ..., "message": ...}`
 - HTTP status codes: 200 OK, 201 Created, 400 Bad Request, 404 Not Found
 
+## Documentation Rule
+
+- **After completing any feature, model, or API endpoint**, you MUST create or update the corresponding project documentation to Feishu (Lark)
+- Use `lark-cli` commands to push documentation (prefer `lark-cli markdown` for technical docs)
+- Documentation should cover: what was built, API endpoints, data models, key design decisions
+- If a Feishu doc already exists for the project, update it; otherwise create a new one
+- This is mandatory — do not skip documentation after code changes
+
 ## Gotchas
 
 - Always run `uv run python manage.py migrate` after model changes
