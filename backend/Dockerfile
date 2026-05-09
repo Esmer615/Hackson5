@@ -14,4 +14,4 @@ RUN uv sync --frozen --no-dev
 
 # Run migrations and start server
 EXPOSE 8000
-CMD ["sh", "-c", "python manage.py migrate && gunicorn config.asgi:application --bind 0.0.0.0:8000 --workers 2"]
+CMD ["sh", "-c", "uv run python manage.py migrate && uv run gunicorn config.asgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2"]
