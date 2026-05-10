@@ -13,9 +13,14 @@ import type {
 // Instead of going through Vercel's proxy (which has a strict 4.5MB Serverless request body limit
 // and a 10s maximum timeout), we bypass Vercel entirely and direct the browser to upload
 // straight to the Railway backend. CORS has been enabled on the backend to allow this.
+let envUrl = process.env.NEXT_PUBLIC_API_URL || '';
+// If the environment variable accidentally points back to Vercel, override it to the Railway backend
+if (envUrl.includes('vercel.app')) {
+  envUrl = 'https://hackson5-production.up.railway.app';
+}
+
 const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://hackson5-production.up.railway.app'
+  envUrl || 'https://hackson5-production.up.railway.app'
 ).replace(/\/+$/, '');
 
 type JsonBody = Record<string, unknown>;
