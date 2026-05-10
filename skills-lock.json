@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "lark-doc": {
+      "source": "larksuite/cli",
+      "sourceType": "github",
+      "skillPath": "skills/lark-doc/SKILL.md",
+      "computedHash": "4dd262521adaf7ed4c7bd8acd9bf9b96ee05c477fab10c9e5ed7ef21769b60ab"
+    },
+    "lark-markdown": {
+      "source": "larksuite/cli",
+      "sourceType": "github",
+      "skillPath": "skills/lark-markdown/SKILL.md",
+      "computedHash": "e141bc85b0348db2a10b60896db5d3d61cb569744b796b96c4d65beb62b186f9"
+    },
+    "lark-slides": {
+      "source": "larksuite/cli",
+      "sourceType": "github",
+      "skillPath": "skills/lark-slides/SKILL.md",
+      "computedHash": "b65e6a37b52b2ea0e8ecb00c3abededaa46045195b8698cbeecb0e9fb526e675"
+    },
+    "lark-wiki": {
+      "source": "larksuite/cli",
+      "sourceType": "github",
+      "skillPath": "skills/lark-wiki/SKILL.md",
+      "computedHash": "b1ebd928e9bccd604dbd378e7e8a04761e545adb7397441793d3928e97d626df"
+    }
+  }
+}
