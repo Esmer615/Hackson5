@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "apps.core",
+    "apps.textbooks",
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024
+
+DEEPSEEK_API_KEY = ENV("DEEPSEEK_API_KEY", default="")
+DEEPSEEK_BASE_URL = ENV("DEEPSEEK_BASE_URL", default="https://api.deepseek.com")
+DEEPSEEK_MODEL = ENV("DEEPSEEK_MODEL", default="deepseek-chat")
+DEMO_MAX_PAGES = ENV.int("DEMO_MAX_PAGES", default=12)
+QUALITY_MAX_PAGES = ENV.int("QUALITY_MAX_PAGES", default=80)
 
 
 # CORS

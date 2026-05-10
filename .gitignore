@@ -29,6 +29,13 @@ Thumbs.db
 
 # Claude
 .claude/
+.superpowers/
+
+# Uploads and local data
+media/
+backend/media/
+data/textbooks/*.pdf
+*.pdf
 
 # Build
 *.pyc
