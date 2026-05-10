@@ -117,14 +117,32 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@keyframes panel-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-w-80 antialiased;
+    text-rendering: optimizeLegibility;
   }
   html {
-    @apply font-sans;
+    @apply scroll-smooth font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background: oklch(0.84 0.08 205 / 35%);
+    color: var(--foreground);
   }
 }
