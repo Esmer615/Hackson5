@@ -242,6 +242,12 @@ export default function Workbench() {
     }
   }
 
+  function handleClear() {
+    setSelectedFiles([]);
+    setUploadedTextbooks([]);
+    setToast({ tone: 'info', message: '已清空已选文件和上传列表' });
+  }
+
   async function handleRunPipeline() {
     if (uploadedTextbooks.length === 0) {
       setToast({ tone: 'info', message: '请先上传教材，再运行流水线。' });
@@ -467,6 +473,16 @@ export default function Workbench() {
                     >
                       <FileText className="size-4" />
                       Upload Files
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={handleClear}
+                      disabled={uploadBusy}
+                      className="rounded-full px-4"
+                    >
+                      Clear
                     </Button>
                     <span className="text-xs text-slate-500">
                       {selectedFiles.length > 0
