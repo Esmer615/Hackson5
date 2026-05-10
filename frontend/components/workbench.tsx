@@ -225,7 +225,7 @@ export default function Workbench() {
     setUploadBusy(true);
     try {
       const response = await uploadTextbooks(files, mode);
-      setUploadedTextbooks(response.textbooks);
+      setUploadedTextbooks((prev) => [...prev, ...response.textbooks]);
       setToast({
         tone: 'success',
         message: `已上传 ${response.textbooks.length} 本教材`,
