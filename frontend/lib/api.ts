@@ -10,12 +10,13 @@ import type {
   UploadTextbooksData,
 } from '@/lib/types';
 
-// Force client to use relative paths so Vercel can proxy requests to the backend
-// This avoids CORS issues on preview branches.
-const API_BASE_URL =
-  typeof window !== 'undefined'
-    ? ''
-    : (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/+$/, '');
+// Instead of going through Vercel's proxy (which has a strict 4.5MB Serverless request body limit
+// and a 10s maximum timeout), we bypass Vercel entirely and direct the browser to upload
+// straight to the Railway backend. CORS has been enabled on the backend to allow this.
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL ||
+  'https://hackson5-production.up.railway.app'
+).replace(/\/+$/, '');
 
 type JsonBody = Record<string, unknown>;
 
