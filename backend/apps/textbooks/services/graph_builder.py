@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from typing import Any, Protocol
 
 from django.db import transaction
@@ -96,7 +97,10 @@ def _build_node_id(textbook_id: int, chapter_id: int, name: str, index: int) -> 
     safe_name = "_".join(part for part in safe_name.split("_") if part)
     if not safe_name:
         safe_name = f"node_{index}"
-    return f"book_{textbook_id}_chapter_{chapter_id}_{index}_{safe_name}"[:255]
+    unique_suffix = uuid.uuid4().hex[:8]
+    root = f"book_{textbook_id}_chapter_{chapter_id}_{index}_{safe_name}"
+    node_id = f"{root}_{unique_suffix}"
+    return node_id[:255]
 
 
 def _coerce_positive_int(value: Any, *, default: int) -> int:
