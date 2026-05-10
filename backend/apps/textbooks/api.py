@@ -140,6 +140,28 @@ def teacher_chat(request, payload: TeacherChatIn) -> dict[str, Any]:
     return {"data": result, "message": "ok"}
 
 
+@router.post("/system/clear")
+def system_clear(request) -> dict[str, Any]:
+    from apps.textbooks.models import (
+        Chapter,
+        IntegrationDecision,
+        KnowledgeEdge,
+        KnowledgeNode,
+        PipelineRun,
+        RagChunk,
+        Textbook,
+    )
+
+    PipelineRun.objects.all().delete()
+    RagChunk.objects.all().delete()
+    KnowledgeEdge.objects.all().delete()
+    KnowledgeNode.objects.all().delete()
+    Chapter.objects.all().delete()
+    Textbook.objects.all().delete()
+    IntegrationDecision.objects.all().delete()
+    return {"data": {}, "message": "System data cleared successfully"}
+
+
 @router.get("/report")
 def report(request) -> dict[str, Any]:
     textbook_ids = list(Textbook.objects.order_by("id").values_list("id", flat=True))

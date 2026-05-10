@@ -25,6 +25,7 @@ import {
   runPipeline,
   sendTeacherFeedback,
   uploadTextbooks,
+  clearSystem,
 } from '@/lib/api';
 import type {
   GraphData,
@@ -242,10 +243,28 @@ export default function Workbench() {
     }
   }
 
-  function handleClear() {
-    setSelectedFiles([]);
-    setUploadedTextbooks([]);
-    setToast({ tone: 'info', message: '已清空已选文件和上传列表' });
+  async function handleClear() {
+    setUploadBusy(true);
+    try {
+      await clearSystem();
+      setSelectedFiles([]);
+      setUploadedTextbooks([]);
+      setStatus(null);
+      setGraphData({ nodes: [], edges: [] });
+      setSelectedNode(null);
+      setReport('');
+      setRagCitations([]);
+      setRagAnswer('');
+      setTeacherReply('');
+      setToast({ tone: 'success', message: '已彻底清空后端数据库和应用状态' });
+    } catch (err) {
+      setToast({
+        tone: 'error',
+        message: err instanceof Error ? err.message : '清空失败',
+      });
+    } finally {
+      setUploadBusy(false);
+    }
   }
 
   async function handleRunPipeline() {

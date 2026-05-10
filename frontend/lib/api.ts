@@ -109,3 +109,7 @@ export function sendTeacherFeedback(
 export function getReport(): Promise<ReportResult> {
   return request<ReportResult>('/api/report');
 }
+
+export function clearSystem(): Promise<void> {
+  return postJson<void>('/api/system/clear', {});
+}
