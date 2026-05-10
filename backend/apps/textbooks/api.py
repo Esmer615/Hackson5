@@ -96,7 +96,7 @@ def graph(request, integrated: bool = Query(False)) -> dict[str, Any]:
         nodes = nodes.filter(is_integrated=True)
     node_ids = list(nodes.values_list("id", flat=True))
     edges = KnowledgeEdge.objects.filter(
-        Q(source_id__in=node_ids) | Q(target_id__in=node_ids)
+        Q(source_id__in=node_ids) & Q(target_id__in=node_ids)
     ).select_related("source", "target")
     return {
         "data": {
