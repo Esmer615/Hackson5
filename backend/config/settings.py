@@ -126,6 +126,9 @@ QUALITY_MAX_PAGES = ENV.int("QUALITY_MAX_PAGES", default=80)
 # CORS
 # https://github.com/adamchainz/django-cors-headers
 
+# Allow all origins for Vercel previews and Hackathon flexibility
+CORS_ALLOW_ALL_ORIGINS = True
+
 CORS_ALLOWED_ORIGINS = ENV.list(
     "CORS_ALLOWED_ORIGINS",
     default=[

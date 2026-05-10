@@ -1,102 +1,183 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working with code in this repository.
+This file provides guidance to Claude Code when working with this repository.
+
+## Project Snapshot
+
+Hackson5 is a 5-hour hackathon full-stack project. The scaffold is complete and deployed; business functionality has not started yet.
+
+Production URLs:
+- Frontend: `https://hackson5.vercel.app`
+- Backend: `https://hackson5-production.up.railway.app`
+- Health checks:
+  - `https://hackson5.vercel.app/api/health` -> `{"status": "ok"}`
+  - `https://hackson5-production.up.railway.app/api/health` -> `{"status": "ok"}`
+
+Feishu docs:
+- Project overview: `https://www.feishu.cn/wiki/YkCHwgrwCikkDakWa7kcTLYJnsh`
+- Deployment notes: `https://www.feishu.cn/wiki/Y6C2wbfcRiqOCRkTqHCcgW7in4c`
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15 (App Router) + Tailwind CSS + shadcn/ui + pnpm
-- **Backend**: Python 3.12 + Django 5 + Django Ninja + uv
-- **Database**: SQLite (development)
+- **Frontend**: Next.js 16 App Router + React 19 + Tailwind CSS v4 + shadcn/ui + pnpm
+- **Backend**: Python 3.12 target + Django 6 + Django Ninja + uv
+- **Database**: SQLite fallback locally; Railway PostgreSQL in production via `DATABASE_URL`
+- **Deployment**: Vercel frontend, Railway backend + PostgreSQL
+- **Docs**: Feishu/Lark via `lark-cli`
 
-## Build & Run Commands
+## Commands
 
 ```bash
 # Frontend
-cd frontend && pnpm dev          # Start dev server
-cd frontend && pnpm build        # Production build
-cd frontend && pnpm lint         # Lint
+cd frontend && pnpm dev
+cd frontend && pnpm build
+cd frontend && pnpm lint
+cd frontend && pnpm format
+cd frontend && pnpx shadcn@latest add <component>
 
 # Backend
-cd backend && uv run python manage.py runserver    # Start dev server
-cd backend && uv run python manage.py migrate       # Run migrations
-cd backend && uv run python manage.py makemigrations # Create migrations
-cd backend && uv run pytest                          # Run tests
-cd backend && uv run pytest path/to/test.py::test_name  # Run single test
+cd backend && uv run python manage.py runserver
+cd backend && uv run python manage.py migrate
+cd backend && uv run python manage.py makemigrations
+cd backend && uv run pytest
+cd backend && uv run pytest path/to/test.py::test_name
+cd backend && uv run ruff check .
+cd backend && uv run ruff format .
+
+# Deploy/ops
+vercel --prod --yes --token "$VERCEL_TOKEN"
+railway logs --service Hackson5 --deployment --latest --lines 100
+railway logs --service Hackson5 --build --latest --lines 100
 ```
 
 ## Architecture
 
 ```
 Hackson5/
-├── frontend/           # Next.js 15 App Router
-│   ├── app/           # Pages and layouts (App Router)
-│   ├── components/    # React components
-│   │   └── ui/       # shadcn/ui components (do NOT manually edit)
-│   ├── lib/           # Utilities, helpers, configs
-│   └── public/        # Static assets
-├── backend/            # Django project
-│   ├── config/        # Django settings, urls, wsgi
-│   ├── apps/          # Django apps (each app = one domain)
-│   │   └── <app>/
-│   │       ├── api.py     # Django Ninja API endpoints
-│   │       ├── models.py  # Database models
-│   │       ├── schemas.py # Pydantic schemas (request/response)
-│   │       └── services.py# Business logic
-│   └── tests/         # Test files
+├── frontend/                 # Next.js App Router frontend
+│   ├── app/                  # routes, layout, pages
+│   ├── components/           # React components
+│   │   └── ui/               # shadcn/ui components (CLI-managed)
+│   ├── lib/utils.ts          # cn() and shared frontend helpers
+│   ├── next.config.ts        # /api/* rewrite to NEXT_PUBLIC_API_URL
+│   └── vercel.json           # Vercel frontend config
+├── backend/                  # Django backend
+│   ├── Dockerfile            # Railway Docker deployment
+│   ├── config/
+│   │   ├── api.py            # Ninja API root, registers app routers
+│   │   ├── settings.py       # env-based settings, DB, CORS
+│   │   ├── urls.py           # /api/ -> Ninja API
+│   │   └── wsgi.py           # gunicorn entrypoint
+│   ├── apps/
+│   │   └── core/
+│   │       ├── api.py        # currently GET /health
+│   │       ├── models.py
+│   │       ├── schemas.py
+│   │       └── services.py
+│   └── tests/test_health.py
+├── docs/                     # local Markdown source for Feishu docs
+├── railway.json              # Railway Dockerfile config
+├── vercel.json               # minimal Vercel root config
 └── CLAUDE.md
 ```
 
-- Frontend runs on `localhost:3000`, Backend on `localhost:8000`
-- Backend API prefix: `/api/`
-- Frontend proxies `/api/*` to backend via Next.js rewrites in `next.config.js`
+Runtime request flow:
+
+```text
+Browser -> Vercel frontend -> /api/* rewrite -> Railway Django backend -> Railway PostgreSQL
+```
 
 ## Code Conventions
 
 ### TypeScript / React
 
-- Use `export default function ComponentName()` for page components
-- Use named exports `export function Xxx()` for reusable components
-- Use `cn()` from `@/lib/utils` for conditional class merging
-- Import shadcn/ui components from `@/components/ui/` — do NOT manually edit these files, use `pnpx shadcn@latest add <component>` instead
-- Server Components by default, add `"use client"` only when needed (state, effects, event handlers, browser APIs)
-- Use `async/await` in Server Components for data fetching
-- Path aliases: `@/` maps to `frontend/`
+- Use Server Components by default; add `"use client"` only for state/effects/events/browser APIs.
+- Use `export default function PageName()` for page components.
+- Use named exports for reusable components.
+- Use `cn()` from `@/lib/utils` for class merging.
+- Import shadcn/ui from `@/components/ui/`; do not hand-edit generated ui components unless unavoidable.
+- Tailwind CSS only; no CSS modules or styled-components.
+- Responsive mobile-first with `sm:`, `md:`, `lg:`.
 
 ### Python / Django
 
-- Use Django Ninja (not DRF) for all API endpoints — define in each app's `api.py`
-- Use Pydantic schemas in `schemas.py` for request/response validation
-- Keep business logic in `services.py`, not in views or models
-- Type hints required on all function signatures
-- Use `uv add <package>` to install dependencies (NOT `pip install`)
-- Use `uv run` prefix for all Python commands in this project
-- Model naming: singular, e.g. `User`, `Project` (not `Users`, `Projects`)
+- Use Django Ninja, not DRF.
+- Each backend app should use:
+  - `api.py` for endpoints
+  - `schemas.py` for Pydantic request/response schemas
+  - `services.py` for business logic
+  - `models.py` for database models
+- Register app routers in `backend/config/api.py`.
+- Type hints required on function signatures.
+- Use `uv add <package>`, not `pip install`.
+- Use `uv run ...` for Python commands locally.
+- Model names are singular (`User`, `Project`).
 
-### Styling
+### API
 
-- Tailwind CSS only — no CSS modules, no styled-components
-- Follow shadcn/ui theming conventions (CSS variables in `globals.css`)
-- Responsive: mobile-first, use `sm:` `md:` `lg:` breakpoints
+- API prefix is `/api/`.
+- RESTful routes use plural nouns: `/api/resources/`, `/api/resources/{id}/`.
+- Standard response shape: `{"data": ..., "message": ...}` unless a simple health/status endpoint.
+- Status codes: 200 OK, 201 Created, 400 Bad Request, 404 Not Found.
 
-### API Conventions
+## Quality Gates
 
-- RESTful: `GET /api/resources/`, `POST /api/resources/`, `GET /api/resources/{id}/`
-- Use plural nouns for resource names
-- Return consistent response format: `{"data": ..., "message": ...}`
-- HTTP status codes: 200 OK, 201 Created, 400 Bad Request, 404 Not Found
+- Frontend: ESLint 9 + Prettier + Tailwind class sorting.
+- Backend: Ruff lint/format with `E`, `F`, `I`, `N`, `W`, `UP`.
+- Git pre-commit: husky + lint-staged.
+- Do not skip hooks unless explicitly requested.
+
+## Deployment Notes
+
+Railway backend:
+- Project: `hackson5`
+- Service: `Hackson5`
+- Public domain: `https://hackson5-production.up.railway.app`
+- Uses `backend/Dockerfile` via `railway.json`.
+- Docker runtime puts `/app/backend/.venv/bin` on PATH and runs:
+  - `python manage.py migrate`
+  - `gunicorn config.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2`
+- Important env vars:
+  - `DATABASE_URL=${{Postgres.DATABASE_URL}}`
+  - `DEBUG=False`
+  - `ALLOWED_HOSTS=hackson5-production.up.railway.app,hackson5.vercel.app`
+  - `CORS_ALLOWED_ORIGINS=https://hackson5.vercel.app`
+  - `CSRF_TRUSTED_ORIGINS=https://hackson5.vercel.app`
+
+Vercel frontend:
+- Project: `hackson5`
+- Production alias: `https://hackson5.vercel.app`
+- Root Directory: `frontend`
+- Build Command: `pnpm build`
+- Install Command: `pnpm install`
+- Output Directory: `.next`
+- Env var: `NEXT_PUBLIC_API_URL=https://hackson5-production.up.railway.app`
+
+## AI / Tooling
+
+- superpowers plugin is enabled for brainstorming/planning/debugging/verification workflows.
+- Context7 MCP is available for current docs lookup.
+- SQLite MCP is available for local DB inspection.
+- Railway MCP/CLI is available for Railway status/logs/variables.
+- Lark skills are installed via `.agents/skills/*`; `.claude/skills/*` are symlinks to them, so do not delete `.agents/` unless reinstalling skills.
 
 ## Documentation Rule
 
-- **After completing any feature, model, or API endpoint**, you MUST create or update the corresponding project documentation to Feishu (Lark)
-- Use `lark-cli` commands to push documentation (prefer `lark-cli markdown` for technical docs)
-- Documentation should cover: what was built, API endpoints, data models, key design decisions
-- If a Feishu doc already exists for the project, update it; otherwise create a new one
-- This is mandatory — do not skip documentation after code changes
+After completing any feature, model, or API endpoint, update the corresponding Feishu documentation using `lark-cli`.
+
+Documentation should cover:
+- What was built
+- API endpoints
+- Data models
+- Key design decisions
+- Deployment/config changes, if any
 
 ## Gotchas
 
-- Always run `uv run python manage.py migrate` after model changes
-- shadcn/ui components are managed by CLI — don't hand-edit `components/ui/`
-- Next.js App Router: page components must be in `app/` directory with `page.tsx`
-- Django Ninja: register API routers in `config/api.py`
-- Use `uv run` not `python` directly — uv manages the virtual environment
+- Current business functionality is empty: frontend is default page, backend only has `GET /api/health`.
+- Do not delete `.agents/` casually; Lark Claude skills symlink to it.
+- `.vercel/` is local Vercel state and should stay ignored.
+- Local backend defaults to SQLite when `DATABASE_URL` is unset.
+- Production uses PostgreSQL through Railway `DATABASE_URL`.
+- After model changes, run migrations locally and let Railway run migrations on deploy.
+- Next.js generated `frontend/AGENTS.md` warns this Next version has breaking changes; check local Next docs if using unfamiliar APIs.

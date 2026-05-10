@@ -10,10 +10,12 @@ import type {
   UploadTextbooksData,
 } from '@/lib/types';
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? '').replace(
-  /\/+$/,
-  '',
-);
+// Force client to use relative paths so Vercel can proxy requests to the backend
+// This avoids CORS issues on preview branches.
+const API_BASE_URL =
+  typeof window !== 'undefined'
+    ? ''
+    : (process.env.NEXT_PUBLIC_API_URL ?? '').replace(/\/+$/, '');
 
 type JsonBody = Record<string, unknown>;
 
